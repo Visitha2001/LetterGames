@@ -22,7 +22,7 @@ const WORDS_TO_WIN = 15;
 type LetterState = {
     char: string;
     id: number;
-    used: boolean;
+    // used is no longer needed here
 }
 
 export function GameClient({ puzzle, difficulty }: GameClientProps) {
@@ -33,7 +33,7 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [currentGuess, setCurrentGuess] = useState<LetterState[]>([]);
   const [gameLetters, setGameLetters] = useState<LetterState[]>(
-      puzzle.letters.map((char, index) => ({ char, id: index, used: false }))
+      puzzle.letters.map((char, index) => ({ char, id: index }))
   );
   const [message, setMessage] = useState<{text: string, type: 'error' | 'success'} | null>(null);
 
@@ -70,17 +70,12 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
   }
   
   const handleLetterClick = (letter: LetterState) => {
-    if (letter.used) return;
-
     setCurrentGuess(prev => [...prev, letter]);
-    setGameLetters(prev => prev.map(l => l.id === letter.id ? {...l, used: true} : l));
   }
 
   const handleBackspace = () => {
       if(currentGuess.length === 0) return;
-      const lastLetter = currentGuess[currentGuess.length - 1];
       setCurrentGuess(prev => prev.slice(0, -1));
-      setGameLetters(prev => prev.map(l => l.id === lastLetter.id ? {...l, used: false} : l));
   }
 
   const handleSubmit = () => {
@@ -88,7 +83,29 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
     
     if (guessWord.length === 0) return;
 
-    if (foundWords.includes(guessWord)) {
+    // Check if the guess uses only available letters and correct counts
+    const guessLetterCounts: { [key: string]: number } = {};
+    for (const letter of guessWord) {
+      guessLetterCounts[letter] = (guessLetterCounts[letter] || 0) + 1;
+    }
+
+    const availableLetterCounts: { [key: string]: number } = {};
+    for (const letter of puzzle.letters) {
+       const l = letter.toLowerCase();
+       availableLetterCounts[l] = (availableLetterCounts[l] || 0) + 1;
+    }
+
+    let valid = true;
+    for (const letter in guessLetterCounts) {
+      if (!availableLetterCounts[letter] || guessLetterCounts[letter] > availableLetterCounts[letter]) {
+        valid = false;
+        break;
+      }
+    }
+
+    if (!valid) {
+      showMessage("You used letters you don't have!", 'error');
+    } else if (foundWords.includes(guessWord)) {
       showMessage("Already found!", 'error');
     } else if (puzzle.possibleWords.map(w => w.toLowerCase()).includes(guessWord)) {
       setFoundWords(prev => [...prev, guessWord].sort((a,b) => b.length - a.length));
@@ -99,7 +116,6 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
     
     // Reset for next guess
     setCurrentGuess([]);
-    setGameLetters(prev => prev.map(l => ({...l, used: false})));
   };
   
   const formatTime = (seconds: number) => {
@@ -162,12 +178,12 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
             </CardHeader>
             <CardContent>
                 {/* Current Guess Display */}
-                <div className="flex justify-center items-center gap-2 h-20 my-4 bg-primary/10 rounded-lg">
-                  {currentGuess.map((letter) => (
+                <div className="flex justify-center items-center gap-2 h-20 my-4 bg-primary/10 rounded-lg overflow-x-auto p-2">
+                  {currentGuess.map((letter, index) => (
                     <motion.div
-                      key={letter.id}
-                      layoutId={`letter-box-${letter.id}`}
-                      className="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-primary text-primary-foreground rounded-lg shadow-lg text-3xl md:text-4xl font-bold"
+                      key={`${letter.id}-${index}`}
+                      layoutId={`letter-box-${letter.id}-${index}`}
+                      className="flex-shrink-0 flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-primary text-primary-foreground rounded-lg shadow-lg text-3xl md:text-4xl font-bold"
                     >
                       {letter.char.toUpperCase()}
                     </motion.div>
@@ -179,13 +195,12 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
                     {gameLetters.map((letter) => (
                          <motion.div
                             key={letter.id}
-                            layoutId={`letter-box-${letter.id}`}
+                            layoutId={`letter-box-source-${letter.id}`}
                          >
                             <Button
                                 variant="outline"
-                                disabled={letter.used}
                                 onClick={() => handleLetterClick(letter)}
-                                className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-background/80 text-foreground rounded-lg shadow-lg text-2xl md:text-3xl font-bold disabled:opacity-30"
+                                className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-background/80 text-foreground rounded-lg shadow-lg text-2xl md:text-3xl font-bold"
                             >
                                 {letter.char.toUpperCase()}
                             </Button>
