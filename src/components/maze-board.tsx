@@ -39,14 +39,14 @@ export function MazeBoard({ grid, playerPosition, isPaused }: MazeBoardProps) {
   
   return (
     <div
-      className="relative bg-black/20 p-2"
+      className="relative p-2"
       style={{
         border: '1px solid hsl(var(--primary))',
         boxShadow: '0 0 10px hsl(var(--primary))',
       }}
     >
       <div
-        className="relative"
+        className="relative bg-black"
         style={{
           display: "grid",
           gridTemplateColumns: `repeat(${grid[0].length}, ${cellSize}px)`,
