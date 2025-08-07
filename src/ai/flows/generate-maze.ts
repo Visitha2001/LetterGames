@@ -40,11 +40,18 @@ const prompt = ai.definePrompt({
   - '#' represents a wall.
   - ' ' represents an open path.
 
-  The maze should be solvable, meaning there is at least one path from the start to the end.
+  The maze dimensions should be based on the difficulty:
+  - easy: 10x10
+  - medium: 15x15
+  - hard: 20x20
+
+  The entire maze must be enclosed by walls ('#').
+  The start ('S') and end ('E') points must be on the outer edge of the maze, not in the middle.
+  The maze should be solvable, meaning there is at least one path from 'S' to 'E'.
 
   Difficulty: {{{difficulty}}}
 
-  Return the mazeData and isSolvable as a JSON object.`,
+  Return the mazeData and isSolvable as a JSON object. Ensure the mazeData is a single string with newline characters separating the rows.`,
 });
 
 const generateMazeFlow = ai.defineFlow(
