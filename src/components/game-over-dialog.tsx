@@ -15,10 +15,12 @@ type GameOverDialogProps = {
     isOpen: boolean;
     time: string;
     difficulty: string;
+    theme?: string;
     onClose: () => void;
+    gameType: 'word-search' | 'crossword';
 };
 
-export function GameOverDialog({ isOpen, time, difficulty, onClose }: GameOverDialogProps) {
+export function GameOverDialog({ isOpen, time, difficulty, theme, onClose, gameType }: GameOverDialogProps) {
   const router = useRouter();
 
   const handlePlayAgain = () => {
@@ -26,7 +28,7 @@ export function GameOverDialog({ isOpen, time, difficulty, onClose }: GameOverDi
   };
 
   const handleChangeLevel = () => {
-    router.push("/games/word-search");
+    router.push(`/games/${gameType}`);
   };
 
   if (!isOpen) {
@@ -41,7 +43,8 @@ export function GameOverDialog({ isOpen, time, difficulty, onClose }: GameOverDi
             Puzzle Solved!
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center text-muted-foreground pt-2 capitalize">
-            You found all the words for the theme "{theme}" on {difficulty} difficulty.
+            You completed the puzzle on {difficulty} difficulty.
+            {theme && <div>Theme: "{theme}"</div>}
             <div className="text-accent font-mono text-4xl font-bold py-4">
               {time}
             </div>

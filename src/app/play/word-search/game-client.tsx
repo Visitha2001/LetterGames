@@ -106,6 +106,8 @@ export function GameClient({ grid, words, theme, difficulty }: GameClientProps) 
             time={formatTime(timeElapsed)}
             difficulty={difficulty}
             onClose={() => {}}
+            theme={theme}
+            gameType="word-search"
         />
 
         <div className="w-full lg:w-auto flex flex-col items-center">

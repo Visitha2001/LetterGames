@@ -12,12 +12,12 @@ const games = [
         tags: ["classic", "relaxing"],
     },
     {
-        name: "Crossword (Coming Soon)",
+        name: "Crossword",
         description: "Fill in the blanks of a classic crossword puzzle.",
         icon: Puzzle,
-        href: "#",
-        disabled: true,
-        tags: ["coming soon"],
+        href: "/games/crossword",
+        disabled: false,
+        tags: ["classic", "challenging"],
     },
     {
         name: "Letter Scramble (Coming Soon)",
