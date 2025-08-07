@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -163,7 +162,7 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
         time={formatTime(GAME_DURATION - timeLeft)}
         difficulty={difficulty}
         score={foundWords.length}
-        possible={puzzle.possibleWords.length}
+        possible={WORDS_TO_WIN}
         onClose={() => {}}
         gameType="letter-scramble"
         won={gameWon}
@@ -273,7 +272,7 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
             <Card className="bg-background/30">
                 <CardHeader>
                     <CardTitle className="text-xl text-center font-headline">
-                        Found Words: {foundWords.length} / {puzzle.possibleWords.length}
+                        Found Words: {foundWords.length} / {WORDS_TO_WIN}
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -297,5 +296,3 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
     </div>
   );
 }
-
-    
