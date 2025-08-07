@@ -10,12 +10,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "./ui/button";
-import type { Difficulty } from "@/lib/types";
 
 type GameOverDialogProps = {
     isOpen: boolean;
     time: string;
-    difficulty: Difficulty;
+    difficulty: string; // Using string for theme now
     onClose: () => void;
 };
 
@@ -39,10 +38,10 @@ export function GameOverDialog({ isOpen, time, difficulty, onClose }: GameOverDi
       <AlertDialogContent className="bg-background border-accent shadow-[0_0_20px_theme(colors.accent)]">
         <AlertDialogHeader>
           <AlertDialogTitle className="font-headline text-3xl text-center text-primary">
-            Labyrinth Conquered!
+            Puzzle Solved!
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center text-muted-foreground pt-2">
-            You escaped the neon maze.
+            You found all the words for the theme "{difficulty}".
             <div className="text-accent font-mono text-4xl font-bold py-4">
               {time}
             </div>
@@ -50,10 +49,10 @@ export function GameOverDialog({ isOpen, time, difficulty, onClose }: GameOverDi
         </AlertDialogHeader>
         <AlertDialogFooter className="sm:justify-center gap-2">
             <Button onClick={handleChangeLevel} variant="outline" className="text-primary border-primary hover:bg-primary/10 hover:text-primary">
-                Change Level
+                New Game
             </Button>
             <Button onClick={handlePlayAgain} autoFocus>
-                Play Again
+                Play Same Again
             </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
