@@ -1,3 +1,4 @@
+
 "use client";
 
 import { cn } from "@/lib/utils";
@@ -6,21 +7,15 @@ import type { Position } from "@/lib/types";
 type WordSearchBoardProps = {
   grid: string[][];
   selectedCells: Position[];
-  words: string[];
-  foundWords: string[];
+  foundCellPositions: Position[];
   onMouseDown: (pos: Position) => void;
   onMouseEnter: (pos: Position) => void;
 };
 
-export function WordSearchBoard({ grid, selectedCells, words, foundWords, onMouseDown, onMouseEnter }: WordSearchBoardProps) {
+export function WordSearchBoard({ grid, selectedCells, foundCellPositions, onMouseDown, onMouseEnter }: WordSearchBoardProps) {
 
-  const isCellInFoundWord = (pos: Position) => {
-    for (const word of foundWords) {
-        // This is a simplified check. A proper implementation would need to know the exact path of each found word.
-        // For now, we just check if the letter is part of any found word.
-        // This could be improved by storing the path of found words.
-    }
-    return false; // This part needs a better implementation. For now, we will just highlight the new selection.
+  const isCellFound = (pos: Position) => {
+    return foundCellPositions.some(p => p.row === pos.row && p.col === pos.col);
   };
 
   return (
@@ -43,14 +38,15 @@ export function WordSearchBoard({ grid, selectedCells, words, foundWords, onMous
         {grid.map((row, r) =>
           row.map((cell, c) => {
             const isSelected = selectedCells.some(p => p.row === r && p.col === c);
+            const isFound = isCellFound({row: r, col: c});
             return (
               <div
                 key={`${r}-${c}`}
                 className={cn(
                   "flex items-center justify-center font-mono text-lg font-bold rounded-sm aspect-square",
                   "transition-colors duration-200",
-                  isSelected ? "bg-accent text-accent-foreground" : "bg-primary/10",
-                  isCellInFoundWord({row:r, col:c}) ? "bg-primary text-primary-foreground" : "" // This won't work yet
+                  isSelected ? "bg-accent text-accent-foreground" : 
+                  isFound ? "bg-primary text-primary-foreground" : "bg-primary/10",
                 )}
                 onMouseDown={() => onMouseDown({ row: r, col: c })}
                 onMouseEnter={() => onMouseEnter({ row: r, col: c })}

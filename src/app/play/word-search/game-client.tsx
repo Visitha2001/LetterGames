@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -19,6 +20,7 @@ type GameClientProps = {
 export function GameClient({ grid, words, theme }: GameClientProps) {
   const router = useRouter();
   const [foundWords, setFoundWords] = useState<string[]>([]);
+  const [foundCellPositions, setFoundCellPositions] = useState<Position[]>([]);
   const [selectedCells, setSelectedCells] = useState<Position[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
@@ -36,11 +38,12 @@ export function GameClient({ grid, words, theme }: GameClientProps) {
 
   const checkSelection = useCallback(() => {
     const selectedWord = selectedCells.map(({ row, col }) => grid[row][col]).join("");
-    const reversedSelectedWord = selectedCells.reverse().map(({ row, col }) => grid[row][col]).join("");
+    const reversedSelectedWord = [...selectedCells].reverse().map(({ row, col }) => grid[row][col]).join("");
 
     for (const word of words) {
         if (!foundWords.includes(word) && (word.toUpperCase() === selectedWord || word.toUpperCase() === reversedSelectedWord)) {
             setFoundWords(prev => [...prev, word]);
+            setFoundCellPositions(prev => [...prev, ...selectedCells]);
             if (foundWords.length + 1 === words.length) {
                 setGameWon(true);
             }
@@ -87,6 +90,7 @@ export function GameClient({ grid, words, theme }: GameClientProps) {
 
   const handleReset = () => {
     setFoundWords([]);
+    setFoundCellPositions([]);
     setSelectedCells([]);
     setTimeElapsed(0);
     setGameWon(false);
@@ -125,8 +129,7 @@ export function GameClient({ grid, words, theme }: GameClientProps) {
             <WordSearchBoard 
                 grid={grid}
                 selectedCells={selectedCells}
-                foundWords={foundWords}
-                words={words}
+                foundCellPositions={foundCellPositions}
                 onMouseDown={handleMouseDown}
                 onMouseEnter={handleMouseEnter}
             />
