@@ -9,6 +9,7 @@ const games = [
         description: "Find hidden words in a grid of letters.",
         icon: Search,
         href: "/games/word-search",
+        disabled: false,
         tags: ["classic", "relaxing"],
     },
     {
@@ -20,12 +21,12 @@ const games = [
         tags: ["classic", "challenging"],
     },
     {
-        name: "Letter Scramble (Coming Soon)",
+        name: "Letter Scramble",
         description: "Make as many words as you can from a set of letters.",
         icon: Sword,
-        href: "#",
-        disabled: true,
-        tags: ["coming soon"],
+        href: "/games/letter-scramble",
+        disabled: false,
+        tags: ["fast-paced", "challenging"],
     }
 ]
 
