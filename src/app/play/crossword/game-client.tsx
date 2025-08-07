@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 
 import type { GenerateCrosswordOutput } from '@/ai/flows/generate-crossword';
 import { Button } from '@/components/ui/button';
