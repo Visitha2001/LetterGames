@@ -1,15 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import type { GenerateLetterScrambleOutput } from '@/ai/flows/generate-letter-scramble';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Home, RotateCcw, TimerIcon, Wand2, ArrowRight, Shuffle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Home, RotateCcw, TimerIcon, ArrowRight, Shuffle, Backspace } from 'lucide-react';
 import { GameOverDialog } from '@/components/game-over-dialog';
 import { cn } from '@/lib/utils';
 
@@ -18,22 +16,26 @@ type GameClientProps = {
   difficulty: 'easy' | 'medium' | 'hard';
 };
 
-const GAME_DURATION = 120; // 2 minutes
+const GAME_DURATION = 300; // 5 minutes
+
+type LetterState = {
+    char: string;
+    id: number;
+    used: boolean;
+}
 
 export function GameClient({ puzzle, difficulty }: GameClientProps) {
   const router = useRouter();
-  const { toast } = useToast();
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [gameOver, setGameOver] = useState(false);
   const [foundWords, setFoundWords] = useState<string[]>([]);
-  const [currentGuess, setCurrentGuess] = useState('');
-  const [gameLetters, setGameLetters] = useState(puzzle.letters);
+  const [currentGuess, setCurrentGuess] = useState<LetterState[]>([]);
+  const [gameLetters, setGameLetters] = useState<LetterState[]>(
+      puzzle.letters.map((char, index) => ({ char, id: index, used: false }))
+  );
   const [message, setMessage] = useState<{text: string, type: 'error' | 'success'} | null>(null);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
   useEffect(() => {
-    inputRef.current?.focus();
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
@@ -50,28 +52,44 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
 
   const showMessage = (text: string, type: 'error' | 'success') => {
       setMessage({ text, type });
-      setTimeout(() => setMessage(null), 2000);
+      setTimeout(() => setMessage(null), 1500);
   }
 
   const handleShuffle = () => {
       setGameLetters(prev => [...prev].sort(() => Math.random() - 0.5));
   }
+  
+  const handleLetterClick = (letter: LetterState) => {
+    if (letter.used) return;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const guess = currentGuess.toLowerCase();
+    setCurrentGuess(prev => [...prev, letter]);
+    setGameLetters(prev => prev.map(l => l.id === letter.id ? {...l, used: true} : l));
+  }
+
+  const handleBackspace = () => {
+      if(currentGuess.length === 0) return;
+      const lastLetter = currentGuess[currentGuess.length - 1];
+      setCurrentGuess(prev => prev.slice(0, -1));
+      setGameLetters(prev => prev.map(l => l.id === lastLetter.id ? {...l, used: false} : l));
+  }
+
+  const handleSubmit = () => {
+    const guessWord = currentGuess.map(l => l.char).join('').toLowerCase();
     
-    if (guess.length === 0) return;
+    if (guessWord.length === 0) return;
 
-    if (foundWords.includes(guess)) {
+    if (foundWords.includes(guessWord)) {
       showMessage("Already found!", 'error');
-    } else if (puzzle.possibleWords.map(w => w.toLowerCase()).includes(guess)) {
-      setFoundWords(prev => [...prev, guess].sort((a,b) => b.length - a.length));
+    } else if (puzzle.possibleWords.map(w => w.toLowerCase()).includes(guessWord)) {
+      setFoundWords(prev => [...prev, guessWord].sort((a,b) => b.length - a.length));
       showMessage("Great word!", 'success');
     } else {
-      showMessage("Not in word list.", 'error');
+      showMessage("Not a valid word.", 'error');
     }
-    setCurrentGuess('');
+    
+    // Reset for next guess
+    setCurrentGuess([]);
+    setGameLetters(prev => prev.map(l => ({...l, used: false})));
   };
   
   const formatTime = (seconds: number) => {
@@ -132,37 +150,49 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
                 </div>
             </CardHeader>
             <CardContent>
-                <div className="flex justify-center items-center gap-2 md:gap-4 my-8">
-                    {gameLetters.map((letter, index) => (
+                {/* Current Guess Display */}
+                <div className="flex justify-center items-center gap-2 h-20 my-4 bg-primary/10 rounded-lg">
+                  {currentGuess.map((letter) => (
+                    <motion.div
+                      key={letter.id}
+                      layoutId={`letter-box-${letter.id}`}
+                      className="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-primary text-primary-foreground rounded-lg shadow-lg text-3xl md:text-4xl font-bold"
+                    >
+                      {letter.char.toUpperCase()}
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Available Letters */}
+                <div className="flex justify-center items-center gap-2 md:gap-3 my-8">
+                    {gameLetters.map((letter) => (
                          <motion.div
-                            key={`${letter}-${index}`}
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 0.5 }}
-                            className="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-primary text-primary-foreground rounded-lg shadow-lg text-3xl md:text-4xl font-bold"
-                        >
-                            {letter.toUpperCase()}
+                            key={letter.id}
+                            layoutId={`letter-box-${letter.id}`}
+                         >
+                            <Button
+                                variant="outline"
+                                disabled={letter.used}
+                                onClick={() => handleLetterClick(letter)}
+                                className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-background/80 text-foreground rounded-lg shadow-lg text-2xl md:text-3xl font-bold disabled:opacity-30"
+                            >
+                                {letter.char.toUpperCase()}
+                            </Button>
                          </motion.div>
                     ))}
                 </div>
                 
-                <form onSubmit={handleSubmit} className="flex gap-2 mt-8">
-                    <Input 
-                        ref={inputRef}
-                        value={currentGuess}
-                        onChange={e => setCurrentGuess(e.target.value)}
-                        placeholder="Type your word..."
-                        className="text-lg text-center tracking-widest"
-                        autoCapitalize="none"
-                        autoComplete="off"
-                        autoCorrect="off"
-                    />
-                    <Button type="submit" size="icon">
-                        <ArrowRight />
+                <div className="flex gap-2 mt-8">
+                    <Button onClick={handleBackspace} variant="outline" size="icon" className="w-16">
+                        <Backspace />
                     </Button>
-                     <Button type="button" variant="outline" size="icon" onClick={handleShuffle}>
+                    <Button onClick={handleSubmit} className="flex-grow">
+                        Submit Word
+                    </Button>
+                     <Button type="button" variant="outline" size="icon" onClick={handleShuffle} className="w-16">
                         <Shuffle />
                     </Button>
-                </form>
+                </div>
 
             </CardContent>
         </Card>
