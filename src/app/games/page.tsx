@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Puzzle, Sword } from "lucide-react";
+import { Search, Sword } from "lucide-react";
 import Link from "next/link";
 
 const games = [
@@ -11,14 +11,6 @@ const games = [
         href: "/games/word-search",
         disabled: false,
         tags: ["classic", "relaxing"],
-    },
-    {
-        name: "Crossword",
-        description: "Fill in the blanks of a classic crossword puzzle.",
-        icon: Puzzle,
-        href: "/games/crossword",
-        disabled: false,
-        tags: ["classic", "challenging"],
     },
     {
         name: "Letter Scramble",
@@ -35,7 +27,7 @@ export default function GamesPage() {
         <div className="text-center">
             <h1 className="text-5xl font-bold font-headline text-primary mb-4">Choose a Puzzle</h1>
             <p className="text-lg text-muted-foreground mb-8">Select a game to start playing.</p>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 gap-6">
                 {games.map((game) => (
                     <Card key={game.name} className="bg-background/50 hover:border-primary transition-colors flex flex-col">
                         <CardHeader>
