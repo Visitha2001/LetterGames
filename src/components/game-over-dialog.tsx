@@ -19,10 +19,11 @@ type GameOverDialogProps = {
     score?: number;
     possible?: number;
     onClose: () => void;
-    gameType: 'word-search' | 'crossword' | 'letter-scramble';
+    gameType: 'word-search' | 'letter-scramble';
+    won?: boolean;
 };
 
-export function GameOverDialog({ isOpen, time, difficulty, theme, score, possible, onClose, gameType }: GameOverDialogProps) {
+export function GameOverDialog({ isOpen, time, difficulty, theme, score, possible, onClose, gameType, won = true }: GameOverDialogProps) {
   const router = useRouter();
 
   const handlePlayAgain = () => {
@@ -36,13 +37,20 @@ export function GameOverDialog({ isOpen, time, difficulty, theme, score, possibl
   if (!isOpen) {
     return null;
   }
+  
+  const titleText = () => {
+    if (gameType === 'letter-scramble') {
+      return won ? "You Won!" : "Time's Up!";
+    }
+    return "Puzzle Solved!";
+  }
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent className="bg-background border-accent shadow-[0_0_20px_theme(colors.accent)]">
         <AlertDialogHeader>
           <AlertDialogTitle className="font-headline text-3xl text-center text-primary">
-            {gameType === 'letter-scramble' ? "Time's Up!" : "Puzzle Solved!"}
+            {titleText()}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center text-muted-foreground pt-2 capitalize">
             You completed the puzzle on {difficulty} difficulty.

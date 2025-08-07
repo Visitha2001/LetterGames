@@ -17,6 +17,7 @@ type GameClientProps = {
 };
 
 const GAME_DURATION = 300; // 5 minutes
+const WORDS_TO_WIN = 15;
 
 type LetterState = {
     char: string;
@@ -28,6 +29,7 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
   const router = useRouter();
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
   const [gameOver, setGameOver] = useState(false);
+  const [gameWon, setGameWon] = useState(false);
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [currentGuess, setCurrentGuess] = useState<LetterState[]>([]);
   const [gameLetters, setGameLetters] = useState<LetterState[]>(
@@ -36,6 +38,7 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
   const [message, setMessage] = useState<{text: string, type: 'error' | 'success'} | null>(null);
 
   useEffect(() => {
+    if (gameOver) return;
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
@@ -48,7 +51,14 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [gameOver]);
+
+  useEffect(() => {
+    if (foundWords.length >= WORDS_TO_WIN) {
+      setGameWon(true);
+      setGameOver(true);
+    }
+  }, [foundWords]);
 
   const showMessage = (text: string, type: 'error' | 'success') => {
       setMessage({ text, type });
@@ -110,6 +120,7 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
         possible={puzzle.possibleWords.length}
         onClose={() => {}}
         gameType="letter-scramble"
+        won={gameWon}
       />
       
       <div className="w-full max-w-md mx-auto">
