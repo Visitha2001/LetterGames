@@ -14,7 +14,7 @@ import { Button } from "./ui/button";
 type GameOverDialogProps = {
     isOpen: boolean;
     time: string;
-    difficulty: string; // Using string for theme now
+    difficulty: string;
     onClose: () => void;
 };
 
@@ -26,7 +26,7 @@ export function GameOverDialog({ isOpen, time, difficulty, onClose }: GameOverDi
   };
 
   const handleChangeLevel = () => {
-    router.push("/");
+    router.push("/games/word-search");
   };
 
   if (!isOpen) {
@@ -40,8 +40,8 @@ export function GameOverDialog({ isOpen, time, difficulty, onClose }: GameOverDi
           <AlertDialogTitle className="font-headline text-3xl text-center text-primary">
             Puzzle Solved!
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-center text-muted-foreground pt-2">
-            You found all the words for the theme "{difficulty}".
+          <AlertDialogDescription className="text-center text-muted-foreground pt-2 capitalize">
+            You found all the words for the theme "{theme}" on {difficulty} difficulty.
             <div className="text-accent font-mono text-4xl font-bold py-4">
               {time}
             </div>

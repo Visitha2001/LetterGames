@@ -8,11 +8,17 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const THEMES = ["animals", "space", "food", "sports", "nature", "technology", "movies", "music"];
 
-export default async function WordSearchPage() {
+export default async function WordSearchPage({ searchParams }: { searchParams: { difficulty: 'easy' | 'medium' | 'hard' } }) {
+  const { difficulty } = searchParams;
+  
+  if (!['easy', 'medium', 'hard'].includes(difficulty)) {
+    return notFound();
+  }
+  
   const theme = THEMES[Math.floor(Math.random() * THEMES.length)];
   
   try {
-    const { grid, words } = await generateWordSearch({ theme });
+    const { grid, words } = await generateWordSearch({ theme, difficulty });
 
     if (!grid || !words || grid.length === 0 || words.length === 0) {
       return (
@@ -25,13 +31,13 @@ export default async function WordSearchPage() {
             </AlertDescription>
           </Alert>
           <Button asChild className="mt-4">
-            <Link href="/">Return to Home</Link>
+            <Link href="/games/word-search">Return to Menu</Link>
           </Button>
         </div>
       );
     }
     
-    return <GameClient grid={grid} words={words} theme={theme} />;
+    return <GameClient grid={grid} words={words} theme={theme} difficulty={difficulty} />;
   } catch (error) {
     console.error("Error generating word search:", error);
     return (

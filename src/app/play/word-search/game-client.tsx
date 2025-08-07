@@ -15,9 +15,10 @@ type GameClientProps = {
   grid: string[][];
   words: string[];
   theme: string;
+  difficulty: 'easy' | 'medium' | 'hard';
 };
 
-export function GameClient({ grid, words, theme }: GameClientProps) {
+export function GameClient({ grid, words, theme, difficulty }: GameClientProps) {
   const router = useRouter();
   const [foundWords, setFoundWords] = useState<string[]>([]);
   const [foundCellPositions, setFoundCellPositions] = useState<Position[]>([]);
@@ -89,11 +90,7 @@ export function GameClient({ grid, words, theme }: GameClientProps) {
   };
 
   const handleReset = () => {
-    setFoundWords([]);
-    setFoundCellPositions([]);
-    setSelectedCells([]);
-    setTimeElapsed(0);
-    setGameWon(false);
+    router.refresh();
   };
 
   const formatTime = (seconds: number) => {
@@ -107,13 +104,13 @@ export function GameClient({ grid, words, theme }: GameClientProps) {
         <GameOverDialog
             isOpen={gameWon}
             time={formatTime(timeElapsed)}
-            difficulty={theme}
+            difficulty={difficulty}
             onClose={() => {}}
         />
 
         <div className="w-full lg:w-auto flex flex-col items-center">
-            <header className="w-full max-w-md flex justify-between items-center p-4 rounded-lg bg-background/50 backdrop-blur-sm mb-4 z-20">
-              <Button variant="outline" size="icon" onClick={() => router.push('/')}>
+            <header className="w-full max-w-lg flex justify-between items-center p-4 rounded-lg bg-background/50 backdrop-blur-sm mb-4 z-20">
+              <Button variant="outline" size="icon" onClick={() => router.push('/games/word-search')}>
                 <Home className="h-5 w-5"/>
                 <span className="sr-only">Home</span>
               </Button>
