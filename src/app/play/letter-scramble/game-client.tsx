@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { GenerateLetterScrambleOutput } from '@/ai/flows/generate-letter-scramble';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Home, RotateCcw, TimerIcon, ArrowRight, Shuffle, Backspace } from 'lucide-react';
+import { Home, RotateCcw, TimerIcon, Shuffle, Delete } from 'lucide-react';
 import { GameOverDialog } from '@/components/game-over-dialog';
 import { cn } from '@/lib/utils';
 
@@ -184,7 +184,7 @@ export function GameClient({ puzzle, difficulty }: GameClientProps) {
                 
                 <div className="flex gap-2 mt-8">
                     <Button onClick={handleBackspace} variant="outline" size="icon" className="w-16">
-                        <Backspace />
+                        <Delete />
                     </Button>
                     <Button onClick={handleSubmit} className="flex-grow">
                         Submit Word
